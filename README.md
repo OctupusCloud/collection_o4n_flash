@@ -1,5 +1,7 @@
 # Ansible Collection - octupus.o4n_flash
 
+Collection to automate files tasks with flash cards in network devices, including file transfer, dir checkings, bootloader changes.
+
 ## Modules
 
 - o4n_flash_chgldr: Change boot loader in IOS and IOSXE configuration.

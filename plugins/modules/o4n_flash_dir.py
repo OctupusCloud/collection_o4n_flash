@@ -134,7 +134,7 @@ def connectToDevice(_dev_type, _ip, _user, _passw, _sshconf, _enable="", _delayf
         if _enable:
             fromDevice.enable()
         success = True
-        ret_msg = "Successful connection"   
+        ret_msg = "Successful connection"
     except Exception as error:
         ret_msg = "connection error: {}".format(str(error).splitlines())
         success = False

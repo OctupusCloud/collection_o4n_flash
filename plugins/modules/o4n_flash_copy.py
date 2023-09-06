@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
@@ -8,12 +8,12 @@ DOCUMENTATION = """
 module: o4n_flash_copy
 version_added: "4.0"
 author: "Ed Scrimaglia"
-short_description: copy file desde y hacia la flash de un dispositivo de networking
+short_description: Copy file desde y hacia la flash de un dispositivo de networking.
 description:
   - Conecta con los dispositivos de networking a vía ssh (netmiko).
-  - Verifica espacio disponible en la flash
-  - Verifica integridad md5
-  - Copia archivos desde y hacia la flash
+  - Verifica espacio disponible en la flash.
+  - Verifica integridad md5.
+  - Copia archivos desde y hacia la flash.
 notes:
   - Testeado en IOS, IOSXE
 options:
@@ -43,15 +43,15 @@ options:
         description:
             path del source file
         values:
-            - system path para operacion put
-            - no para operacion get
+            - system: path para operacion put
+            - no: para operacion get
         requerido: True
     d_path:
         description:
             path del destination file
         values:
-            - system path para operacion get
-            - no para operacion put
+            - system: path para operacion get
+            - no: para operacion put
         requerido: False
     f_system:
         description:
@@ -128,7 +128,7 @@ tasks:
         delay_factor: 2
         ssh_config: "~/.ssh/config_proxy"
       register: salida
-      
+
   - name: Oction Flash copy. Copia file desde la flash hacia el file system local
       o4n_flash_copy:
         host_address: "{{ansible_host}}"
@@ -146,44 +146,38 @@ tasks:
 """
 
 RETURN = """
-msg:
-    {
-        {
-            description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato. Transfer False
-            salida: {
-                "changed": false,
-                "failed": false,
-                "msg": "File not transferred",
-                "std_out": {
-                    "disk_space": true,
-                    "file_exists": true,
-                    "file_name": "test.yaml",
-                    "file_transferred": false,
-                    "file_verified": true,
-                    "md5": "ok",
-                    "time": "00:02.785901"
-                }
-            }
-        },
-        {
-            description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato. Transfer True
-            salida: {
-                "changed": false,
-                "failed": false,
-                "msg": "File Transfer done",
-                "std_out": {
-                    "disk_space": true,
-                    "file_exists": true,
-                    "file_name": "test.yaml",
-                    "file_transferred": true,
-                    "file_verified": true,
-                    "md5": "fail",
-                    "time": "00:02.999014"
-                }
+case1:
+    description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato. Transfer False
+    "salida": {
+        "changed": false,
+        "failed": false,
+        "msg": "File not transferred",
+        "std_out": {
+            "disk_space": true,
+            "file_exists": true,
+            "file_name": "test.yaml",
+            "file_transferred": false,
+            "file_verified": true,
+            "md5": "ok",
+            "time": "00:02.785901"
             }
         }
-    }
-
+case2:
+    description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato. Transfer True
+    "salida": {
+        "changed": false,
+        "failed": false,
+        "msg": "File Transfer done",
+        "std_out": {
+            "disk_space": true,
+            "file_exists": true,
+            "file_name": "test.yaml",
+            "file_transferred": true,
+            "file_verified": true,
+            "md5": "fail",
+            "time": "00:02.999014"
+            }
+        }
 """
 
 # Modulos
@@ -191,7 +185,6 @@ import netmiko
 from datetime import datetime
 from dateutil import tz
 from ansible.module_utils.basic import AnsibleModule
-import json
 import logging
 
 
@@ -253,7 +246,7 @@ def tranfer_logic(_scp_transfer, _operation, _dmd5, _lpath, _sfile, _dpath, _dfi
                           'md5': 'avoided', 'disk_space': True}
                 ret_msg = "File Transfer done"
             else:
-                if _dmd5 == True:
+                if _dmd5 is True:
                     salida = {'lpath': _rep_lpath, 'sfile': _rep_sfile, 'dpath': _rep_dpath, 'dfile': _rep_dfile,
                               'file_exists': True,
                               'file_transferred': False, 'file_verified': False,
@@ -345,7 +338,7 @@ def write_log_file():
 
     # Write Log File
     logging.basicConfig(filename=create_log, level=logging.DEBUG)
-    logger = logging.getLogger("netmiko")
+    # logger = logging.getLogger("netmiko")
 
 
 # Main

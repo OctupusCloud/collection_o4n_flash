@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
@@ -22,15 +22,15 @@ options:
         requerido: True
     host_address:
         description:
-            Host IP address del dispositivo de networking 
+            Host IP address del dispositivo de networking
         requerido: True
     password:
         description:
-            password para acceder al modo exec al dispositivo de networking via ssh 
+            password para acceder al modo exec al dispositivo de networking via ssh
         requerido: True
     plataforma:
         description:
-            tipo de plataforma conforme al parámetro device_type del módulo netmiko 
+            tipo de plataforma conforme al parámetro device_type del módulo netmiko
         requerido: True
     flash_device:
         description:
@@ -61,57 +61,53 @@ options:
 EXAMPLES = """
 tasks:
   - name: Oction Flash Scanning. Option global search (mismo file en todos los dev)
-      o4n_flash_dir:
-        host_address: "{{ansible_host}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_password}}"
-        enable_password: "{{ansible_become_password}}"
-        plataforma: "{{var_data_model_dev.plataforma}}"
-        flash_device: "{{global.container}}"
-        search: "{{var_data_model.search_file}}"
-        ssh_config: "~/.ssh/config_proxy"
-      register: salida
-  
+    o4n_flash_dir:
+      host_address: "{{ansible_host}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_password}}"
+      enable_password: "{{ansible_become_password}}"
+      plataforma: "{{var_data_model_dev.plataforma}}"
+      flash_device: "{{global.container}}"
+      search: "{{var_data_model.search_file}}"
+      ssh_config: "~/.ssh/config_proxy"
+    register: salida
+
   - name: Oction Flash Scanning. Option dev search (file para cada dev)
-      o4n_flash_dir:
-        host_address: "{{ansible_host}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_password}}"
-        enable_password: "{{ansible_become_password}}"
-        plataforma: "{{var_data_model_dev.plataforma}}"
-        flash_device: "{{device.container}}"
-        search: "{{var_data_model_dev.search_file}}"
-      register: salida    
+    o4n_flash_dir:
+      host_address: "{{ansible_host}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_password}}"
+      enable_password: "{{ansible_become_password}}"
+      plataforma: "{{var_data_model_dev.plataforma}}"
+      flash_device: "{{device.container}}"
+      search: "{{var_data_model_dev.search_file}}"
+    register: salida
 """
 
 RETURN = """
-msg:
-  description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato (ejemplo file found)
-  msg: {
-    "Bytes Free": "xxxxxxx bytes free",
-    "Device": "xx.xx.xx.xx",
-    "Directorio": "/",
-    "Files": [
-        {
-            "file": "size",
-            "file": "size"
+case1:
+    description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato. Ejemplo, file found
+    "salida": {
+        "Bytes_Free": "xxxxxxx bytes free",
+        "Device": "xx.xx.xx.xx",
+        "Directorio": "/",
+        "Files": {
+            "file1": "size1",
+            "file2": "size2"
+            },
+        "Flash": "xxxx",
+        "Flash_capacity": "xxxx bytes total",
+        "Search": {
+            "found": true,
+            "searched": "c2900-universalk9-mz.SPA.155-3.M2.bin"
+            }
         }
-    ],
-    "Flash": "xxxx:",
-    "Flash capacity": "xxxx bytes total".
-    "Search": {
-        "found": true,
-        "searched": "c2900-universalk9-mz.SPA.155-3.M2.bin"
-    }
-  }
 """
 
 from netmiko import ConnectHandler
-from bcrypt import _bcrypt
-import json
 from ansible.module_utils.basic import AnsibleModule
 from collections import OrderedDict
-import re
+
 
 # Connecto to device
 def connectToDevice(_dev_type, _ip, _user, _passw, _sshconf, _enable="", _delayf=.1):
@@ -145,6 +141,7 @@ def connectToDevice(_dev_type, _ip, _user, _passw, _sshconf, _enable="", _delayf
         fromDevice = None
 
     return fromDevice, ret_msg, success
+
 
 # Flash content
 def outputFlash(_device, _cmd, _ip, _file_to_search, _flash="flash0:"):
@@ -190,7 +187,7 @@ def outputFlash(_device, _cmd, _ip, _file_to_search, _flash="flash0:"):
                     else:
                         search_file["found"] = False
                         ret_msg = "scanning flash success and file not found"
-                if search_file["found"] == True:
+                if search_file["found"] is True:
                     break
             success = True
         else:
@@ -203,14 +200,15 @@ def outputFlash(_device, _cmd, _ip, _file_to_search, _flash="flash0:"):
 
     return salida_json, ret_msg, success
 
+
 # Main
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             host_address=dict(required=True),
             user=dict(required=True),
-            password=dict(required=True,no_log=True),
-            enable_password=dict(required=True,no_log=True),
+            password=dict(required=True, no_log=True),
+            enable_password=dict(required=True, no_log=True),
             plataforma=dict(requiered=True),
             flash_device=dict(required=True),
             search=dict(required=False),
@@ -221,7 +219,7 @@ def main():
 
     plataforma = module.params.get("plataforma")
     flash_device = module.params.get("flash_device")
-    search = module.params.get("search") if module.params.get("search") not in ['False','false','no'] else 'no'
+    search = module.params.get("search") if module.params.get("search") not in ['False', 'false', 'no'] else 'no'
     host_address = module.params.get("host_address")
     user = module.params.get("user")
     password = module.params.get("password")

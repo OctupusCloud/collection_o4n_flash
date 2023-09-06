@@ -1,4 +1,4 @@
-#!usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
@@ -10,41 +10,41 @@ version_added: "2.0"
 author: "Ed Scrimaglia"
 short_description: Change boot loader in IOS and IOSXE configuration
 description:
-  - Conecta con los dispositivos de networking a vía ssh (netmiko).
-  - cambia registro de booting
+    - Conecta con los dispositivos de networking a vía ssh (netmiko).
+    - Cambia registro de booting.
 notes:
-  - Testeado en IOS, IOSXE
+    - Testeado en IOS, IOSXE
 options:
     host_address:
         description:
-            Host IP address del dispositivo de networking 
+            - Host IP address del dispositivo de networking
         requerido: True
     user:
         description:
-            Usuario para acceder via ssh al dispositivo de networking 
+            - Usuario para acceder via ssh al dispositivo de networking
         requerido: True
     password:
         description:
-            Contraseña para acceder via ssh al dispositivo de networking 
+            - Contraseña para acceder via ssh al dispositivo de networking
         requerido: True
     enable_password:
         description:
-            Contraseña "enable" para acceder via ssh al dispositivo de networking 
+            - Contraseña "enable" para acceder via ssh al dispositivo de networking
         requerido: True
     plataforma:
         description:
-            tipo de plataforma conforme al parámetro device_type del módulo netmiko 
+            - tipo de plataforma conforme al parámetro device_type del módulo netmiko
         requerido: True
     flash_device:
         description:
-            nombre de la flash en el dispositivo de networking
+            - nombre de la flash en el dispositivo de networking
         values:
             - flash0:, root en flash0
             - flash0:config, directorio config en flash0
         requerido: True
     chg_loader:
         description:
-            nombre imagen desde la cual iniciará el dispositivo de networking
+            - nombre imagen desde la cual iniciará el dispositivo de networking
         values:
             - False: nada que cambiar
             - name_ldr: nombre de la imagen
@@ -52,7 +52,7 @@ options:
         requerido: True
     ssh_config:
         description:
-            configuracio SSH que usará netmiko
+            - configuracio SSH que usará netmiko
         values:
             - nombre del file incluido el path, que contiene la configuracion SSH
         requerido: False
@@ -62,65 +62,60 @@ EXAMPLES = """
 tasks:
   - name: Oction Flash Chg_ldr. Cambia registro de booting
     o4n_flash_chgldr:
-        host_address: "{{ansible_host}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_password}}"
-        enable_password: "{{ansible_become_password}}"
-        plataforma: "{{var_data_model_dev.plataforma}}"
-        flash_device: "{{global.container}}"
-        chg_loader: image_name
-        ssh_config: "~/.ssh/config
+      host_address: "{{ansible_host}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_password}}"
+      enable_password: "{{ansible_become_password}}"
+      plataforma: "{{var_data_model_dev.plataforma}}"
+      flash_device: "{{global.container}}"
+      chg_loader: image_name
+      ssh_config: "~/.ssh/config
     register: salida
 
   - name: Oction Flash Chg_ldr. Clean registro de booting
     o4n_flash_chgldr:
-        host_address: "{{ansible_host}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_password}}"
-        enable_password: "{{ansible_become_password}}"
-        plataforma: "{{var_data_model_dev.plataforma}}"
-        flash_device: "{{global.container}}"
-        chg_loader: clean
+      host_address: "{{ansible_host}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_password}}"
+      enable_password: "{{ansible_become_password}}"
+      plataforma: "{{var_data_model_dev.plataforma}}"
+      flash_device: "{{global.container}}"
+      chg_loader: clean
     register: salida
 
   - name: Oction Flash Chg_ldr. Nothing to change
     o4n_flash_chgldr:
-        host_address: "{{ansible_host}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_password}}"
-        enable_password: "{{ansible_become_password}}"
-        plataforma: "{{var_data_model_dev.plataforma}}"
-        chg_loader: False
+      host_address: "{{ansible_host}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_password}}"
+      enable_password: "{{ansible_become_password}}"
+      plataforma: "{{var_data_model_dev.plataforma}}"
+      chg_loader: False
     register: salida
 """
 
 RETURN = """
-msg:
-    {
-        {
-            description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato.
-            salida: {
-                "changed": false,
-                "failed": false,
-                "msg": "Boot loader changed",
-                "std_out": {
-                    "loader": "boot system flash XXXXX",
-                }
-            }
-        },
-        {
-            description: Retorna un objeto JSON cuyo conteniendo sigue el siguiente formato.
-            salida: {
-                "changed": false,
-                "failed": false,
-                "msg": "Boot loader register cleaned",
-                "std_out": {
-                    "loader": "Boot register cleaned",
-                }
+case1:
+    description: Ojeto JSON cuyo conteniendo sigue el siguiente formato. Ejemplo, Boot loader change.
+    "salida": {
+        "changed": false,
+        "failed": false,
+        "msg": "Boot loader changed",
+        "std_out": {
+            "loader": "boot system flash XXXXX",
             }
         }
-    }
 
+case2:
+    description: Ojeto JSON cuyo conteniendo sigue el siguiente formato. Ejemplo, Boot loader register clean.
+    "salida": {
+        "changed": false,
+        "failed": false,
+        "msg": "Boot loader register cleaned",
+        "std_out": {
+            "loader": "Boot register cleaned",
+            }
+        }
 """
 
 # Modulos
@@ -232,7 +227,7 @@ def outputFlash(_device, _cmd, _ip, _file_to_search, _flash="flash0:"):
                     else:
                         search_file["found"] = False
                         ret_msg = "scanning flash success and file not found"
-                if search_file["found"] == True:
+                if search_file["found"] is True:
                     break
             success = True
         else:
@@ -283,7 +278,7 @@ def chgLoader(_device, _image, _plataforma, _cmd):
                 # Change boot system command
                 success_l = config_command(_device, cmds)
                 if success_l:
-                    output["loader"] = _cmd +  _image
+                    output["loader"] = _cmd + _image
                     save_config(_device)
                     ret_msg = "Boot loader changed"
                     success = True
@@ -305,7 +300,7 @@ def chgLoader(_device, _image, _plataforma, _cmd):
     except Exception as error:
         ret_msg = "Boot loader change has failed, error {}".format(error)
         output["loader"] = False
-        
+
     return ret_msg, success, output
 
 
@@ -316,8 +311,8 @@ def main():
         argument_spec=dict(
             host_address=dict(required=True),
             user=dict(required=True),
-            password=dict(required=True,no_log=True),
-            enable_password=dict(required=True,no_log=True),
+            password=dict(required=True, no_log=True),
+            enable_password=dict(required=True, no_log=True),
             plataforma=dict(required=True),
             flash_device=dict(required=True),
             chg_loader=dict(requiered=True),
@@ -329,8 +324,7 @@ def main():
     change_boot_loader = module.params.get("chg_loader")
     loader_param_parsed = change_boot_loader.replace("'", '"')
     loader_param_json = json.loads(loader_param_parsed)
-    image = loader_param_json.get("boot_image") if loader_param_json.get("boot_image") not in \
-                                                   ['False', 'false', 'no', ""] else "no"
+    image = loader_param_json.get("boot_image") if loader_param_json.get("boot_image") not in ['False', 'false', 'no', ""] else "no"
     boot_cmd = loader_param_json.get("boot_system_cmd")
     plataforma = module.params.get("plataforma")
     flash_device = module.params.get("flash_device")
@@ -339,7 +333,7 @@ def main():
     password = module.params.get("password")
     enable_password = module.params.get("enable_password")
     delay_f = float(module.params.get("delay_factor"))
-    shhconf=module.params.get("ssh_config")
+    shhconf = module.params.get("ssh_config")
 
     # Establece conexión ssh con el dispisitivo
     output = {}
